@@ -242,6 +242,15 @@ export const api = {
     updateUserRole: async (userId: string, role: string) => {
       return apiClient.put(`/admin/users/${userId}/role`, { role });
     },
+    getAnalyticsDataset: async (count: number = 100) => {
+      const res = await apiClient.get(`/admin/analytics-dataset?count=${count}`);
+      return res.data;
+    },
+    exportAnalyticsDatasetUrl: (count: number = 100) => {
+      const token = localStorage.getItem('soundwave_token') || '';
+      const base = apiClient.defaults.baseURL || '/api';
+      return `${base}/admin/analytics-dataset/export?count=${count}&token=${token}`;
+    },
   },
 };
 

@@ -33,7 +33,9 @@ import {
   getAdminStats,
   adminGetUsers,
   adminAddSong,
-  adminDeleteSong
+  adminDeleteSong,
+  getAnalyticsDataset,
+  exportAnalyticsDatasetCSV
 } from '../controllers/apiControllers';
 import { protect, authorize } from '../middleware/auth';
 
@@ -99,5 +101,7 @@ router.get('/admin/stats', protect, authorize('ADMIN'), getAdminStats);
 router.get('/admin/users', protect, authorize('ADMIN'), adminGetUsers);
 router.post('/admin/songs', protect, authorize('ADMIN'), adminAddSong);
 router.delete('/admin/songs/:id', protect, authorize('ADMIN'), adminDeleteSong);
+router.get('/admin/analytics-dataset', protect, authorize('ADMIN'), getAnalyticsDataset);
+router.get('/admin/analytics-dataset/export', protect, authorize('ADMIN'), exportAnalyticsDatasetCSV);
 
 export default router;

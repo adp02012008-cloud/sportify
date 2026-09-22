@@ -16,6 +16,7 @@ import {
   MemoryStore
 } from '../models/store';
 import { isMemoryMode } from '../config/db';
+import { generateDummyUsers, convertUsersToCSV } from '../services/dummyDataGenerator';
 
 // ==========================================
 // 1. AUTH CONTROLLER
@@ -697,4 +698,90 @@ export const adminDeleteSong = async (req: AuthRequest, res: Response): Promise<
     await MgSong.findOneAndDelete({ id });
   }
   res.json({ success: true, message: 'Song deleted.' });
+};
+
+// ==========================================
+// 8. DUMMY USER ANALYTICS DATASET & EXPORT
+// ==========================================
+export const getAnalyticsDataset = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const rawCount = parseInt(req.query.count as string, 10);
+    const count = !isNaN(rawCount) && rawCount >= 50 && rawCount <= 100 ? rawCount : 100;
+    const users = generateDummyUsers(count);
+
+    // Compute preview aggregates
+    const totalUsers = users.length;
+    const activeUsers = users.filter((u) => u.churn === 0).length;
+    const churnedUsers = users.filter((u) => u.churn === 1).length;
+    const premiumUsers = users.filter((u) => u.plan === 'Premium' || u.plan === 'Family' || u.plan === 'Student').length;
+    const highChurnRiskUsers = users.filter((u) => u.churn_risk === 'High').length;
+
+    const avgEngagement = Math.round((users.reduce((acc, u) => acc + u.engagement_score, 0) / totalUsers) * 10) / 10;
+    const avgSatisfaction = Math.round((users.reduce((acc, u) => acc + u.satisfaction_score, 0) / totalUsers) * 10) / 10;
+    const avgMonthlyListeningHours = Math.round((users.reduce((acc, u) => acc + u.monthly_usage_hours, 0) / totalUsers) * 10) / 10;
+    const avgMonthlyBill = Math.round((users.reduce((acc, u) => acc + u.monthly_bill, 0) / totalUsers) * 10) / 10;
+    const avgLoginFrequency = Math.round((users.reduce((acc, u) => acc + u.login_frequency, 0) / totalUsers) * 10) / 10;
+
+    // Distributions for charts
+    const planDistribution = users.reduce((acc: Record<string, number>, u) => {
+      acc[u.plan] = (acc[u.plan] || 0) + 1;
+      return acc;
+    }, {});
+
+    const churnDistribution = {
+      Active: activeUsers,
+      Churned: churnedUsers
+    };
+
+    const churnRiskDistribution = users.reduce((acc: Record<string, number>, u) => {
+      acc[u.churn_risk] = (acc[u.churn_risk] || 0) + 1;
+      return acc;
+    }, {});
+
+    const segmentDistribution = users.reduce((acc: Record<string, number>, u) => {
+      acc[u.user_segment] = (acc[u.user_segment] || 0) + 1;
+      return acc;
+    }, {});
+
+    res.json({
+      success: true,
+      count: totalUsers,
+      summary: {
+        totalUsers,
+        activeUsers,
+        churnedUsers,
+        premiumUsers,
+        avgEngagement,
+        avgSatisfaction,
+        avgMonthlyListeningHours,
+        avgMonthlyBill,
+        avgLoginFrequency,
+        highChurnRiskUsers
+      },
+      distributions: {
+        plans: planDistribution,
+        churn: churnDistribution,
+        churnRisk: churnRiskDistribution,
+        segments: segmentDistribution
+      },
+      users
+    });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message || 'Failed to generate dataset' });
+  }
+};
+
+export const exportAnalyticsDatasetCSV = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const rawCount = parseInt(req.query.count as string, 10);
+    const count = !isNaN(rawCount) && rawCount >= 50 && rawCount <= 100 ? rawCount : 100;
+    const users = generateDummyUsers(count);
+    const csv = convertUsersToCSV(users);
+
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename="soundwave_users_analytics.csv"');
+    res.status(200).send(csv);
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message || 'Failed to export CSV' });
+  }
 };

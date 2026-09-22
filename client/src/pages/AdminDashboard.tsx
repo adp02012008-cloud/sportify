@@ -11,16 +11,30 @@ import {
   Sparkles,
   Search,
   CheckCircle2,
-  XCircle
+  XCircle,
+  Download,
+  RefreshCw,
+  FileSpreadsheet,
+  BarChart3,
+  AlertTriangle,
+  Activity,
+  Flame,
+  Layers,
+  HeartHandshake,
+  Star,
+  Clock,
+  LogIn,
+  SlidersHorizontal,
+  ChevronDown
 } from 'lucide-react';
-import { Song, Artist, Album, User } from '../types';
+import { Song, Artist, Album, User, DummyAnalyticsUser, AnalyticsDatasetResponse } from '../types';
 import { api } from '../services/api';
 import { useToast } from '../context/ToastContext';
 
 export const AdminDashboard: React.FC = () => {
   const { addToast } = useToast();
 
-  const [activeTab, setActiveTab] = useState<'analytics' | 'songs' | 'artists' | 'albums' | 'users'>('analytics');
+  const [activeTab, setActiveTab] = useState<'analytics' | 'export-dataset' | 'songs' | 'artists' | 'albums' | 'users'>('export-dataset');
   const [songs, setSongs] = useState<Song[]>([]);
   const [artists, setArtists] = useState<Artist[]>([]);
   const [albums, setAlbums] = useState<Album[]>([]);
@@ -36,6 +50,14 @@ export const AdminDashboard: React.FC = () => {
   const [newSongDuration, setNewSongDuration] = useState('3:45');
   const [newSongAudioUrl, setNewSongAudioUrl] = useState('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3');
   const [newSongCoverUrl, setNewSongCoverUrl] = useState('https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600&auto=format&fit=crop&q=80');
+
+  // Dummy Dataset Generator & Analytics State
+  const [datasetCount, setDatasetCount] = useState<number>(100);
+  const [datasetLoading, setDatasetLoading] = useState<boolean>(false);
+  const [datasetData, setDatasetData] = useState<AnalyticsDatasetResponse | null>(null);
+  const [datasetSearch, setDatasetSearch] = useState<string>('');
+  const [datasetSegmentFilter, setDatasetSegmentFilter] = useState<string>('All');
+  const [datasetChurnFilter, setDatasetChurnFilter] = useState<'All' | '0' | '1'>('All');
 
   const fetchData = async () => {
     try {
@@ -58,9 +80,63 @@ export const AdminDashboard: React.FC = () => {
     }
   };
 
+  const fetchDataset = async (count: number = datasetCount) => {
+    try {
+      setDatasetLoading(true);
+      const res = await api.admin.getAnalyticsDataset(count);
+      if (res && res.success) {
+        setDatasetData(res);
+        addToast(`Generated ${res.count} realistic SoundWave users!`, 'success');
+      } else {
+        throw new Error(res?.message || 'Failed to generate users');
+      }
+    } catch (err: any) {
+      console.error('Failed to generate dataset', err);
+      addToast('Failed to generate analytics dataset', 'error');
+    } finally {
+      setDatasetLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchData();
+    fetchDataset(100);
   }, []);
+
+  const convertToCSV = (usersList: DummyAnalyticsUser[]): string => {
+    if (usersList.length === 0) return '';
+    const headers = Object.keys(usersList[0]);
+    const rows = usersList.map((u) =>
+      headers
+        .map((header) => {
+          const val = (u as any)[header];
+          if (typeof val === 'string' && (val.includes(',') || val.includes('"') || val.includes('\n'))) {
+            return `"${val.replace(/"/g, '""')}"`;
+          }
+          return val !== undefined && val !== null ? val : '';
+        })
+        .join(',')
+    );
+    return [headers.join(','), ...rows].join('\n');
+  };
+
+  const handleDownloadCSV = () => {
+    if (!datasetData || datasetData.users.length === 0) {
+      addToast('Please generate a dataset first', 'warning');
+      return;
+    }
+    const csvContent = convertToCSV(datasetData.users);
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'soundwave_users_analytics.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    addToast(`Downloaded soundwave_users_analytics.csv (${datasetData.users.length} users)`, 'success');
+  };
 
   const handleDeleteSong = async (id: string, title: string) => {
     if (window.confirm(`Delete song "${title}"?`)) {
@@ -114,28 +190,56 @@ export const AdminDashboard: React.FC = () => {
     }
   };
 
+  // Filtered dataset users for preview table
+  const filteredUsers = (datasetData?.users || []).filter((u) => {
+    const matchesSearch =
+      datasetSearch.trim() === '' ||
+      u.customer_id.toLowerCase().includes(datasetSearch.toLowerCase()) ||
+      u.name.toLowerCase().includes(datasetSearch.toLowerCase()) ||
+      u.city.toLowerCase().includes(datasetSearch.toLowerCase()) ||
+      u.favorite_genre.toLowerCase().includes(datasetSearch.toLowerCase()) ||
+      u.user_segment.toLowerCase().includes(datasetSearch.toLowerCase());
+
+    const matchesSegment =
+      datasetSegmentFilter === 'All' || u.user_segment === datasetSegmentFilter;
+
+    const matchesChurn =
+      datasetChurnFilter === 'All' || String(u.churn) === datasetChurnFilter;
+
+    return matchesSearch && matchesSegment && matchesChurn;
+  });
+
   return (
     <div className="space-y-8 pb-16">
       {/* Header */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-[#172421] via-[#101b1b] to-[#091114] border border-emerald-500/30 flex items-center justify-between shadow-2xl">
+      <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-[#172421] via-[#101b1b] to-[#091114] border border-emerald-500/30 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-2xl">
         <div className="space-y-2">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-semibold">
             <ShieldCheck size={14} />
             <span>Administrator Control Center</span>
           </div>
           <h1 className="text-2xl sm:text-4xl font-extrabold text-white">SoundWave Admin Panel</h1>
-          <p className="text-xs sm:text-sm text-gray-400 max-w-xl">
-            Manage audio catalogue, curate releases, oversee active user accounts, and track platform metrics.
+          <p className="text-xs sm:text-sm text-gray-400 max-w-2xl">
+            Simulate user behaviour, evaluate churn and retention ML models, manage audio catalogue, and oversee platform activity.
           </p>
         </div>
 
-        <button
-          onClick={() => setShowAddSong(true)}
-          className="hidden sm:flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-400 to-purple-500 text-black text-xs font-bold shadow-lg shadow-cyan-500/20 hover:scale-105 active:scale-95 transition-all"
-        >
-          <Plus size={16} />
-          <span>Upload Song</span>
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setActiveTab('export-dataset')}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-500 text-black text-xs font-bold shadow-lg shadow-emerald-500/20 hover:scale-105 active:scale-95 transition-all"
+          >
+            <FileSpreadsheet size={16} />
+            <span>User Analytics & Export</span>
+          </button>
+          <button
+            onClick={() => setShowAddSong(true)}
+            className="hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-400 to-purple-500 text-black text-xs font-bold shadow-lg shadow-cyan-500/20 hover:scale-105 active:scale-95 transition-all"
+          >
+            <Plus size={16} />
+            <span>Upload Song</span>
+          </button>
+        </div>
       </div>
 
       {/* Analytics KPI Row */}
@@ -179,20 +283,601 @@ export const AdminDashboard: React.FC = () => {
 
       {/* Tabs */}
       <div className="flex items-center gap-2 border-b border-[#212440] pb-3 overflow-x-auto">
-        {(['analytics', 'songs', 'artists', 'albums', 'users'] as const).map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold capitalize transition-all ${
-              activeTab === tab
-                ? 'bg-emerald-500 text-black font-bold shadow-md'
-                : 'bg-[#16182c] text-gray-300 hover:bg-[#20233f]'
-            }`}
-          >
-            {tab}
-          </button>
-        ))}
+        {[
+          { id: 'export-dataset' as const, label: 'User Analytics & Export', icon: FileSpreadsheet, badge: 'ML Dataset' },
+          { id: 'analytics' as const, label: 'Overview', icon: BarChart3 },
+          { id: 'songs' as const, label: 'Audio Tracks', icon: Music },
+          { id: 'artists' as const, label: 'Artists', icon: Disc3 },
+          { id: 'albums' as const, label: 'Albums', icon: Layers },
+          { id: 'users' as const, label: 'User Accounts', icon: Users },
+        ].map((tab) => {
+          const Icon = tab.icon;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap ${
+                activeTab === tab.id
+                  ? 'bg-emerald-500 text-black font-bold shadow-lg shadow-emerald-500/20'
+                  : 'bg-[#16182c] text-gray-300 hover:bg-[#20233f]'
+              }`}
+            >
+              <Icon size={14} />
+              <span>{tab.label}</span>
+              {tab.badge && (
+                <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
+                  activeTab === tab.id ? 'bg-black text-emerald-400' : 'bg-emerald-500/20 text-emerald-300'
+                }`}>
+                  {tab.badge}
+                </span>
+              )}
+            </button>
+          );
+        })}
       </div>
+
+      {/* TAB: USER ANALYTICS & EXPORT DATASET */}
+      {activeTab === 'export-dataset' && (
+        <div className="space-y-8 animate-in fade-in duration-200">
+          {/* Generator Controls Toolbar */}
+          <div className="p-6 rounded-3xl bg-gradient-to-br from-[#121529] via-[#0f1122] to-[#0a0c18] border border-[#262c54] shadow-2xl space-y-6">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 text-xs font-semibold">
+                  <Sparkles size={14} />
+                  <span>Synthetic User Simulation Engine</span>
+                </div>
+                <h2 className="text-xl sm:text-2xl font-black text-white">
+                  User Behaviour & Churn Analytics Generator
+                </h2>
+                <p className="text-xs sm:text-sm text-gray-400 max-w-2xl">
+                  Simulate 50–100 completely fictional users with correlated engagement, music consumption, payment health, support tickets, and realistic churn probabilities for machine learning and BI dashboards.
+                </p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-wrap items-center gap-2.5">
+                <div className="flex items-center bg-[#171930] p-1 rounded-xl border border-[#2b2f54]">
+                  {[50, 75, 100].map((count) => (
+                    <button
+                      key={count}
+                      onClick={() => {
+                        setDatasetCount(count);
+                        fetchDataset(count);
+                      }}
+                      disabled={datasetLoading}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                        datasetCount === count
+                          ? 'bg-gradient-to-r from-emerald-500 to-teal-400 text-black shadow-md'
+                          : 'text-gray-300 hover:text-white hover:bg-[#202446]'
+                      }`}
+                    >
+                      Generate {count} Users
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => fetchDataset(datasetCount)}
+                  disabled={datasetLoading}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#1d2140] hover:bg-[#282d56] text-gray-200 text-xs font-semibold border border-[#303766] transition-all disabled:opacity-50"
+                  title="Regenerate dataset with new seed patterns"
+                >
+                  <RefreshCw size={14} className={datasetLoading ? 'animate-spin text-cyan-400' : ''} />
+                  <span>Regenerate Dataset</span>
+                </button>
+
+                <button
+                  onClick={handleDownloadCSV}
+                  disabled={datasetLoading || !datasetData}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-400 via-teal-400 to-emerald-400 text-black text-xs font-extrabold shadow-lg shadow-cyan-400/25 hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
+                >
+                  <Download size={16} />
+                  <span>Download CSV</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-between text-xs text-gray-400 pt-3 border-t border-[#1e2342]">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>Default: <strong>100 users</strong> • Fictional names, emails & IDs (C1001–C1100)</span>
+              </div>
+              <span className="font-mono text-cyan-300 bg-cyan-950/40 px-2 py-0.5 rounded border border-cyan-800/40">
+                Filename: soundwave_users_analytics.csv
+              </span>
+            </div>
+          </div>
+
+          {/* ANALYTICS PREVIEW: 10 KPI METRICS DASHBOARD */}
+          {datasetData && datasetData.summary && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-base font-bold text-white flex items-center gap-2">
+                  <Activity size={18} className="text-cyan-400" />
+                  <span>Analytics Preview Dashboard ({datasetData.count} Users)</span>
+                </h3>
+                <span className="text-xs text-gray-400 font-mono">
+                  Computed from correlated behavioral models
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3.5">
+                {/* 1. Total Users */}
+                <div className="p-4 rounded-2xl bg-[#131526] border border-[#232746] shadow space-y-1">
+                  <div className="flex items-center justify-between text-gray-400 text-xs">
+                    <span>Total Users</span>
+                    <Users size={15} className="text-cyan-400" />
+                  </div>
+                  <p className="text-2xl font-black text-white">{datasetData.summary.totalUsers}</p>
+                  <p className="text-[10px] text-gray-400">Dataset row count</p>
+                </div>
+
+                {/* 2. Active Users */}
+                <div className="p-4 rounded-2xl bg-[#131526] border border-[#232746] shadow space-y-1">
+                  <div className="flex items-center justify-between text-gray-400 text-xs">
+                    <span>Active Users</span>
+                    <CheckCircle2 size={15} className="text-emerald-400" />
+                  </div>
+                  <p className="text-2xl font-black text-emerald-400">{datasetData.summary.activeUsers}</p>
+                  <p className="text-[10px] text-emerald-400/80 font-medium">
+                    {Math.round((datasetData.summary.activeUsers / datasetData.summary.totalUsers) * 100)}% Retained (churn = 0)
+                  </p>
+                </div>
+
+                {/* 3. Churned Users */}
+                <div className="p-4 rounded-2xl bg-[#131526] border border-[#232746] shadow space-y-1">
+                  <div className="flex items-center justify-between text-gray-400 text-xs">
+                    <span>Churned Users</span>
+                    <XCircle size={15} className="text-rose-400" />
+                  </div>
+                  <p className="text-2xl font-black text-rose-400">{datasetData.summary.churnedUsers}</p>
+                  <p className="text-[10px] text-rose-400/80 font-medium">
+                    {Math.round((datasetData.summary.churnedUsers / datasetData.summary.totalUsers) * 100)}% Churned (churn = 1)
+                  </p>
+                </div>
+
+                {/* 4. Premium Users */}
+                <div className="p-4 rounded-2xl bg-[#131526] border border-[#232746] shadow space-y-1">
+                  <div className="flex items-center justify-between text-gray-400 text-xs">
+                    <span>Premium Users</span>
+                    <CreditCard size={15} className="text-purple-400" />
+                  </div>
+                  <p className="text-2xl font-black text-purple-400">{datasetData.summary.premiumUsers}</p>
+                  <p className="text-[10px] text-purple-400/80 font-medium">
+                    Premium, Family, Student
+                  </p>
+                </div>
+
+                {/* 5. Average Engagement */}
+                <div className="p-4 rounded-2xl bg-[#131526] border border-[#232746] shadow space-y-1">
+                  <div className="flex items-center justify-between text-gray-400 text-xs">
+                    <span>Avg Engagement</span>
+                    <Flame size={15} className="text-amber-400" />
+                  </div>
+                  <p className="text-2xl font-black text-amber-400">{datasetData.summary.avgEngagement}</p>
+                  <p className="text-[10px] text-gray-400">Score out of 100</p>
+                </div>
+
+                {/* 6. Average Satisfaction */}
+                <div className="p-4 rounded-2xl bg-[#131526] border border-[#232746] shadow space-y-1">
+                  <div className="flex items-center justify-between text-gray-400 text-xs">
+                    <span>Avg Satisfaction</span>
+                    <Star size={15} className="text-yellow-400" />
+                  </div>
+                  <p className="text-2xl font-black text-yellow-400">{datasetData.summary.avgSatisfaction} / 5.0</p>
+                  <p className="text-[10px] text-gray-400">CSAT benchmark</p>
+                </div>
+
+                {/* 7. Average Monthly Listening Hours */}
+                <div className="p-4 rounded-2xl bg-[#131526] border border-[#232746] shadow space-y-1">
+                  <div className="flex items-center justify-between text-gray-400 text-xs">
+                    <span>Avg Listening Hours</span>
+                    <Clock size={15} className="text-cyan-400" />
+                  </div>
+                  <p className="text-2xl font-black text-white">{datasetData.summary.avgMonthlyListeningHours} <span className="text-xs font-normal text-gray-400">hrs</span></p>
+                  <p className="text-[10px] text-cyan-400 font-medium">Monthly usage</p>
+                </div>
+
+                {/* 8. Average Monthly Bill */}
+                <div className="p-4 rounded-2xl bg-[#131526] border border-[#232746] shadow space-y-1">
+                  <div className="flex items-center justify-between text-gray-400 text-xs">
+                    <span>Avg Monthly Bill</span>
+                    <CreditCard size={15} className="text-emerald-400" />
+                  </div>
+                  <p className="text-2xl font-black text-emerald-400">₹{datasetData.summary.avgMonthlyBill}</p>
+                  <p className="text-[10px] text-gray-400">Blended ARPU</p>
+                </div>
+
+                {/* 9. Average Login Frequency */}
+                <div className="p-4 rounded-2xl bg-[#131526] border border-[#232746] shadow space-y-1">
+                  <div className="flex items-center justify-between text-gray-400 text-xs">
+                    <span>Avg Login Frequency</span>
+                    <LogIn size={15} className="text-indigo-400" />
+                  </div>
+                  <p className="text-2xl font-black text-white">{datasetData.summary.avgLoginFrequency} <span className="text-xs font-normal text-gray-400">days</span></p>
+                  <p className="text-[10px] text-gray-400">Days logged in / month</p>
+                </div>
+
+                {/* 10. High Churn Risk Users */}
+                <div className="p-4 rounded-2xl bg-[#131526] border border-[#232746] shadow space-y-1">
+                  <div className="flex items-center justify-between text-gray-400 text-xs">
+                    <span>High Churn Risk</span>
+                    <AlertTriangle size={15} className="text-rose-400" />
+                  </div>
+                  <p className="text-2xl font-black text-rose-400">{datasetData.summary.highChurnRiskUsers}</p>
+                  <p className="text-[10px] text-rose-400/80 font-medium">
+                    Priority intervention queue
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* DISTRIBUTION CHARTS & VISUALIZATIONS */}
+          {datasetData && (
+            <div className="space-y-6">
+              <h3 className="text-base font-bold text-white flex items-center gap-2">
+                <BarChart3 size={18} className="text-purple-400" />
+                <span>Behavioural & Demographic Distributions</span>
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                {/* 1. Plan Distribution */}
+                <div className="p-5 rounded-2xl bg-[#131526] border border-[#232746] space-y-4">
+                  <h4 className="text-xs font-bold text-gray-300 uppercase tracking-wider flex items-center justify-between">
+                    <span>Plan Distribution</span>
+                    <span className="text-cyan-400 text-[11px] lowercase">4 subscription tiers</span>
+                  </h4>
+                  <div className="space-y-2.5">
+                    {Object.entries(datasetData.distributions.plans || {}).map(([plan, count]) => {
+                      const pct = Math.round((count / datasetData.count) * 100);
+                      const color =
+                        plan === 'Premium'
+                          ? 'bg-purple-400'
+                          : plan === 'Free'
+                          ? 'bg-gray-400'
+                          : plan === 'Family'
+                          ? 'bg-cyan-400'
+                          : 'bg-emerald-400';
+                      return (
+                        <div key={plan} className="space-y-1">
+                          <div className="flex justify-between text-xs">
+                            <span className="font-semibold text-gray-200">{plan}</span>
+                            <span className="text-gray-400 font-mono">{count} users ({pct}%)</span>
+                          </div>
+                          <div className="w-full h-2 bg-[#1b1e36] rounded-full overflow-hidden">
+                            <div className={`h-full ${color} rounded-full`} style={{ width: `${pct}%` }} />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* 2. Churn Distribution */}
+                <div className="p-5 rounded-2xl bg-[#131526] border border-[#232746] space-y-4">
+                  <h4 className="text-xs font-bold text-gray-300 uppercase tracking-wider flex items-center justify-between">
+                    <span>Churn Distribution</span>
+                    <span className="text-rose-400 text-[11px] lowercase">target label (churn: 0 vs 1)</span>
+                  </h4>
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-xs">
+                      <span className="flex items-center gap-1.5 font-semibold text-emerald-400">
+                        <CheckCircle2 size={13} /> Active: {datasetData.distributions.churn.Active}
+                      </span>
+                      <span className="flex items-center gap-1.5 font-semibold text-rose-400">
+                        <XCircle size={13} /> Churned: {datasetData.distributions.churn.Churned}
+                      </span>
+                    </div>
+
+                    <div className="w-full h-4 bg-[#1b1e36] rounded-full overflow-hidden flex">
+                      <div
+                        className="h-full bg-emerald-500 transition-all"
+                        style={{ width: `${(datasetData.distributions.churn.Active / datasetData.count) * 100}%` }}
+                        title={`Active: ${datasetData.distributions.churn.Active}`}
+                      />
+                      <div
+                        className="h-full bg-rose-500 transition-all"
+                        style={{ width: `${(datasetData.distributions.churn.Churned / datasetData.count) * 100}%` }}
+                        title={`Churned: ${datasetData.distributions.churn.Churned}`}
+                      />
+                    </div>
+
+                    <div className="p-3 rounded-xl bg-[#191c36] text-[11px] text-gray-400 leading-relaxed border border-[#262c52]">
+                      Realistic churn distribution incorporates stochastic noise for realistic training/testing datasets in ML classification models.
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. Churn Risk Breakdown */}
+                <div className="p-5 rounded-2xl bg-[#131526] border border-[#232746] space-y-4">
+                  <h4 className="text-xs font-bold text-gray-300 uppercase tracking-wider flex items-center justify-between">
+                    <span>Churn Risk Breakdown</span>
+                    <span className="text-amber-400 text-[11px] lowercase">predictive categorization</span>
+                  </h4>
+                  <div className="space-y-2.5">
+                    {['Low', 'Medium', 'High'].map((risk) => {
+                      const count = datasetData.distributions.churnRisk[risk] || 0;
+                      const pct = Math.round((count / datasetData.count) * 100);
+                      const color =
+                        risk === 'Low'
+                          ? 'bg-emerald-400 text-emerald-400'
+                          : risk === 'Medium'
+                          ? 'bg-amber-400 text-amber-400'
+                          : 'bg-rose-400 text-rose-400';
+                      return (
+                        <div key={risk} className="space-y-1">
+                          <div className="flex justify-between text-xs">
+                            <span className={`font-semibold ${color.split(' ')[1]}`}>{risk} Risk</span>
+                            <span className="text-gray-400 font-mono">{count} users ({pct}%)</span>
+                          </div>
+                          <div className="w-full h-2 bg-[#1b1e36] rounded-full overflow-hidden">
+                            <div className={`h-full ${color.split(' ')[0]} rounded-full`} style={{ width: `${pct}%` }} />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* 4. User Segments (10 segments) */}
+                <div className="p-5 rounded-2xl bg-[#131526] border border-[#232746] space-y-3 lg:col-span-2">
+                  <h4 className="text-xs font-bold text-gray-300 uppercase tracking-wider flex items-center justify-between">
+                    <span>User Segments & Behavioral Archetypes</span>
+                    <span className="text-cyan-400 text-[11px] lowercase">10 cluster groups</span>
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
+                    {Object.entries(datasetData.distributions.segments || {}).map(([segment, count]) => {
+                      const pct = Math.round((count / datasetData.count) * 100);
+                      return (
+                        <div key={segment} className="space-y-1">
+                          <div className="flex justify-between text-xs">
+                            <span className="text-gray-300 font-medium truncate max-w-[180px]">{segment}</span>
+                            <span className="text-gray-400 font-mono text-[11px]">{count} ({pct}%)</span>
+                          </div>
+                          <div className="w-full h-1.5 bg-[#1b1e36] rounded-full overflow-hidden">
+                            <div className="h-full bg-gradient-to-r from-cyan-400 to-purple-400 rounded-full" style={{ width: `${Math.max(5, pct * 4)}%` }} />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* 5. Satisfaction & Ratings Breakdown */}
+                <div className="p-5 rounded-2xl bg-[#131526] border border-[#232746] space-y-4">
+                  <h4 className="text-xs font-bold text-gray-300 uppercase tracking-wider flex items-center justify-between">
+                    <span>Satisfaction Breakdown</span>
+                    <span className="text-yellow-400 text-[11px]">CSAT 1.0 - 5.0</span>
+                  </h4>
+                  <div className="space-y-2">
+                    {[5, 4, 3, 2, 1].map((rating) => {
+                      const count = datasetData.users.filter((u) => Math.round(u.satisfaction_score) === rating).length;
+                      const pct = Math.round((count / datasetData.count) * 100);
+                      return (
+                        <div key={rating} className="space-y-1">
+                          <div className="flex justify-between text-xs">
+                            <span className="flex items-center gap-1 text-gray-300 font-medium">
+                              <span>{rating}</span>
+                              <Star size={11} className="text-yellow-400 fill-yellow-400" />
+                            </span>
+                            <span className="text-gray-400 font-mono text-[11px]">{count} ({pct}%)</span>
+                          </div>
+                          <div className="w-full h-1.5 bg-[#1b1e36] rounded-full overflow-hidden">
+                            <div className="h-full bg-yellow-400 rounded-full" style={{ width: `${pct}%` }} />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* INTERACTIVE DATASET TABLE PREVIEW */}
+          <div className="space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h3 className="text-base font-bold text-white flex items-center gap-2">
+                  <FileSpreadsheet size={18} className="text-emerald-400" />
+                  <span>Simulated User Records ({filteredUsers.length} shown)</span>
+                </h3>
+                <p className="text-xs text-gray-400">Search and explore individual user attributes, metrics, and risk classifications</p>
+              </div>
+
+              {/* Filters */}
+              <div className="flex flex-wrap items-center gap-2.5">
+                <div className="relative min-w-[200px]">
+                  <Search size={14} className="absolute left-3 top-2.5 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search by ID, name, genre..."
+                    value={datasetSearch}
+                    onChange={(e) => setDatasetSearch(e.target.value)}
+                    className="w-full pl-9 pr-3 py-1.5 rounded-xl bg-[#14162b] border border-[#272b50] text-xs text-white placeholder-gray-500 outline-none focus:border-cyan-400"
+                  />
+                </div>
+
+                {/* Segment Filter */}
+                <select
+                  value={datasetSegmentFilter}
+                  onChange={(e) => setDatasetSegmentFilter(e.target.value)}
+                  className="px-3 py-1.5 rounded-xl bg-[#14162b] border border-[#272b50] text-xs text-gray-200 outline-none focus:border-cyan-400"
+                >
+                  <option value="All">All Segments</option>
+                  <option value="Power User">Power User</option>
+                  <option value="Regular User">Regular User</option>
+                  <option value="Casual User">Casual User</option>
+                  <option value="New User">New User</option>
+                  <option value="At Risk">At Risk</option>
+                  <option value="Churned User">Churned User</option>
+                  <option value="Podcast Listener">Podcast Listener</option>
+                  <option value="Audiobook Listener">Audiobook Listener</option>
+                  <option value="Free User">Free User</option>
+                  <option value="Premium Loyal User">Premium Loyal User</option>
+                </select>
+
+                {/* Churn Filter */}
+                <select
+                  value={datasetChurnFilter}
+                  onChange={(e) => setDatasetChurnFilter(e.target.value as any)}
+                  className="px-3 py-1.5 rounded-xl bg-[#14162b] border border-[#272b50] text-xs text-gray-200 outline-none focus:border-cyan-400"
+                >
+                  <option value="All">All Churn Status</option>
+                  <option value="0">Active (0)</option>
+                  <option value="1">Churned (1)</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Table */}
+            <div className="rounded-2xl bg-[#131526] border border-[#232746] overflow-hidden shadow-xl">
+              <div className="overflow-x-auto max-h-[550px]">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead className="sticky top-0 z-10 bg-[#171932] text-gray-400 border-b border-[#232746]">
+                    <tr>
+                      <th className="p-3">Customer ID</th>
+                      <th className="p-3">User & City</th>
+                      <th className="p-3">Plan</th>
+                      <th className="p-3">Segment</th>
+                      <th className="p-3">Engagement</th>
+                      <th className="p-3">Satisfaction</th>
+                      <th className="p-3">Usage / Month</th>
+                      <th className="p-3">Trend %</th>
+                      <th className="p-3">Complaints</th>
+                      <th className="p-3">Churn Risk</th>
+                      <th className="p-3">Churn</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#1f2238]">
+                    {filteredUsers.length === 0 ? (
+                      <tr>
+                        <td colSpan={11} className="p-8 text-center text-gray-400">
+                          No users match the current search or filter criteria.
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredUsers.map((u) => (
+                        <tr key={u.customer_id} className="hover:bg-[#191b33] transition-colors">
+                          <td className="p-3 font-mono font-bold text-cyan-300">
+                            {u.customer_id}
+                          </td>
+                          <td className="p-3">
+                            <div>
+                              <p className="font-semibold text-white">{u.name}</p>
+                              <p className="text-[10px] text-gray-400">{u.city}, {u.country} • {u.age}y</p>
+                            </div>
+                          </td>
+                          <td className="p-3">
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                              u.plan === 'Premium'
+                                ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
+                                : u.plan === 'Family'
+                                ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
+                                : u.plan === 'Student'
+                                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                                : 'bg-gray-700/30 text-gray-400 border border-gray-600/30'
+                            }`}>
+                              {u.plan}
+                            </span>
+                          </td>
+                          <td className="p-3">
+                            <span className="text-gray-300 text-[11px] font-medium">
+                              {u.user_segment}
+                            </span>
+                          </td>
+                          <td className="p-3">
+                            <div className="flex items-center gap-1.5 font-mono">
+                              <span className={`font-bold ${
+                                u.engagement_score >= 70
+                                  ? 'text-emerald-400'
+                                  : u.engagement_score >= 40
+                                  ? 'text-amber-400'
+                                  : 'text-rose-400'
+                              }`}>
+                                {u.engagement_score}
+                              </span>
+                              <span className="text-[10px] text-gray-500">/100</span>
+                            </div>
+                          </td>
+                          <td className="p-3">
+                            <div className="flex items-center gap-1 text-yellow-400 font-mono text-[11px]">
+                              <span>{u.satisfaction_score}</span>
+                              <Star size={11} className="fill-yellow-400" />
+                            </div>
+                          </td>
+                          <td className="p-3 font-mono text-gray-300">
+                            <div>
+                              <span>{u.monthly_usage_hours} hrs</span>
+                              <p className="text-[10px] text-gray-400 font-sans">{u.songs_played_monthly} songs</p>
+                            </div>
+                          </td>
+                          <td className="p-3 font-mono">
+                            <span className={`font-bold text-[11px] ${
+                              u.usage_change_pct >= 0 ? 'text-emerald-400' : 'text-rose-400'
+                            }`}>
+                              {u.usage_change_pct >= 0 ? `+${u.usage_change_pct}%` : `${u.usage_change_pct}%`}
+                            </span>
+                          </td>
+                          <td className="p-3 font-mono text-gray-400">
+                            {u.complaint_count > 0 ? (
+                              <span className="text-rose-400 font-bold">{u.complaint_count} ({u.open_complaints} open)</span>
+                            ) : (
+                              <span className="text-gray-500">0</span>
+                            )}
+                          </td>
+                          <td className="p-3">
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                              u.churn_risk === 'Low'
+                                ? 'bg-emerald-500/20 text-emerald-400'
+                                : u.churn_risk === 'Medium'
+                                ? 'bg-amber-500/20 text-amber-400'
+                                : 'bg-rose-500/20 text-rose-400 font-black'
+                            }`}>
+                              {u.churn_risk}
+                            </span>
+                          </td>
+                          <td className="p-3">
+                            <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                              u.churn === 1
+                                ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30'
+                                : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                            }`}>
+                              {u.churn === 1 ? '1 (Churned)' : '0 (Active)'}
+                            </span>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Bottom Download Reminder Bar */}
+            <div className="p-4 rounded-2xl bg-gradient-to-r from-[#141b2b] via-[#111e22] to-[#121626] border border-cyan-500/30 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+                  <Download size={20} />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-white">Export Complete Analytical Record</h4>
+                  <p className="text-xs text-gray-400">Standard RFC-compliant CSV containing all 86 user, engagement, usage, payment, and churn columns.</p>
+                </div>
+              </div>
+
+              <button
+                onClick={handleDownloadCSV}
+                className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-400 to-emerald-400 text-black font-extrabold text-xs shadow-lg shadow-cyan-500/20 hover:scale-105 active:scale-95 transition-all"
+              >
+                Download CSV ({datasetData ? datasetData.users.length : 100} Rows)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Tab: Analytics View */}
       {activeTab === 'analytics' && (
