@@ -30,6 +30,7 @@ import {
 import { Song, Artist, Album, User, DummyAnalyticsUser, AnalyticsDatasetResponse } from '../types';
 import { api } from '../services/api';
 import { useToast } from '../context/ToastContext';
+import { generateDummyUsers } from '../services/dummyDataGenerator';
 
 export const AdminDashboard: React.FC = () => {
   const { addToast } = useToast();
@@ -83,13 +84,69 @@ export const AdminDashboard: React.FC = () => {
   const fetchDataset = async (count: number = datasetCount) => {
     try {
       setDatasetLoading(true);
-      const res = await api.admin.getAnalyticsDataset(count);
-      if (res && res.success) {
-        setDatasetData(res);
-        addToast(`Generated ${res.count} realistic SoundWave users!`, 'success');
-      } else {
-        throw new Error(res?.message || 'Failed to generate users');
+      try {
+        const res = await api.admin.getAnalyticsDataset(count);
+        if (res && res.success && res.users && res.users.length > 0) {
+          setDatasetData(res);
+          addToast(`Generated ${res.count} realistic SoundWave users!`, 'success');
+          return;
+        }
+      } catch (backendErr) {
+        console.warn('Backend analytics API unavailable or warming up, generating instant client dataset', backendErr);
       }
+
+      // Instant client-side fallback
+      const users = generateDummyUsers(count);
+      const totalUsers = users.length;
+      const activeUsers = users.filter((u) => u.churn === 0).length;
+      const churnedUsers = users.filter((u) => u.churn === 1).length;
+      const premiumUsers = users.filter((u) => u.plan === 'Premium' || u.plan === 'Family' || u.plan === 'Student').length;
+      const highChurnRiskUsers = users.filter((u) => u.churn_risk === 'High').length;
+
+      const avgEngagement = Math.round((users.reduce((acc, u) => acc + u.engagement_score, 0) / totalUsers) * 10) / 10;
+      const avgSatisfaction = Math.round((users.reduce((acc, u) => acc + u.satisfaction_score, 0) / totalUsers) * 10) / 10;
+      const avgMonthlyListeningHours = Math.round((users.reduce((acc, u) => acc + u.monthly_usage_hours, 0) / totalUsers) * 10) / 10;
+      const avgMonthlyBill = Math.round((users.reduce((acc, u) => acc + u.monthly_bill, 0) / totalUsers) * 10) / 10;
+      const avgLoginFrequency = Math.round((users.reduce((acc, u) => acc + u.login_frequency, 0) / totalUsers) * 10) / 10;
+
+      const planDistribution = users.reduce((acc: Record<string, number>, u) => {
+        acc[u.plan] = (acc[u.plan] || 0) + 1;
+        return acc;
+      }, {});
+      const churnDistribution = { Active: activeUsers, Churned: churnedUsers };
+      const churnRiskDistribution = users.reduce((acc: Record<string, number>, u) => {
+        acc[u.churn_risk] = (acc[u.churn_risk] || 0) + 1;
+        return acc;
+      }, {});
+      const segmentDistribution = users.reduce((acc: Record<string, number>, u) => {
+        acc[u.user_segment] = (acc[u.user_segment] || 0) + 1;
+        return acc;
+      }, {});
+
+      setDatasetData({
+        success: true,
+        count: totalUsers,
+        summary: {
+          totalUsers,
+          activeUsers,
+          churnedUsers,
+          premiumUsers,
+          avgEngagement,
+          avgSatisfaction,
+          avgMonthlyListeningHours,
+          avgMonthlyBill,
+          avgLoginFrequency,
+          highChurnRiskUsers
+        },
+        distributions: {
+          plans: planDistribution,
+          churn: churnDistribution,
+          churnRisk: churnRiskDistribution,
+          segments: segmentDistribution
+        },
+        users
+      });
+      addToast(`Generated ${totalUsers} realistic SoundWave users!`, 'success');
     } catch (err: any) {
       console.error('Failed to generate dataset', err);
       addToast('Failed to generate analytics dataset', 'error');
