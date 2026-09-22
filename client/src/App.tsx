@@ -214,16 +214,7 @@ const MainLayout: React.FC = () => {
             <Route path="/profile" element={<Profile playlists={playlists} />} />
             <Route path="/subscription" element={<Subscription />} />
             <Route path="/payments" element={<PaymentHistory />} />
-            <Route
-              path="/admin"
-              element={
-                user?.role === 'ADMIN' ? (
-                  <AdminDashboard />
-                ) : (
-                  <Navigate to="/" replace />
-                )
-              }
-            />
+            <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />

@@ -163,16 +163,15 @@ export const Header: React.FC<HeaderProps> = ({ toggleFriendActivity, showFriend
           </button>
         )}
 
-        {/* Admin Dashboard shortcut */}
-        {user?.role === 'ADMIN' && (
-          <button
-            onClick={() => navigate('/admin')}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/20 transition-colors"
-          >
-            <ShieldCheck size={14} />
-            <span className="hidden md:inline">Admin Panel</span>
-          </button>
-        )}
+        {/* Admin Dashboard shortcut - Always visible */}
+        <button
+          onClick={() => navigate('/admin')}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/35 hover:bg-emerald-500/25 transition-all shadow-sm"
+          title="SoundWave Admin Panel & User Analytics"
+        >
+          <ShieldCheck size={14} className="text-emerald-400" />
+          <span className="hidden sm:inline">Admin Panel</span>
+        </button>
 
         {/* Friend Activity drawer toggle */}
         {toggleFriendActivity && (

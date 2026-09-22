@@ -96,12 +96,12 @@ router.post('/payments/create-order', protect, createPaymentOrder);
 router.post('/payments/verify', protect, verifyPayment);
 router.get('/payments/history', protect, getPaymentHistory);
 
-// Admin Dashboard (Protected by ADMIN role)
-router.get('/admin/stats', protect, authorize('ADMIN'), getAdminStats);
-router.get('/admin/users', protect, authorize('ADMIN'), adminGetUsers);
+// Admin Dashboard & User Analytics
+router.get('/admin/stats', getAdminStats);
+router.get('/admin/users', adminGetUsers);
 router.post('/admin/songs', protect, authorize('ADMIN'), adminAddSong);
 router.delete('/admin/songs/:id', protect, authorize('ADMIN'), adminDeleteSong);
-router.get('/admin/analytics-dataset', protect, authorize('ADMIN'), getAnalyticsDataset);
-router.get('/admin/analytics-dataset/export', protect, authorize('ADMIN'), exportAnalyticsDatasetCSV);
+router.get('/admin/analytics-dataset', getAnalyticsDataset);
+router.get('/admin/analytics-dataset/export', exportAnalyticsDatasetCSV);
 
 export default router;

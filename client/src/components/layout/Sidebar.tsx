@@ -153,24 +153,27 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
       )}
 
-      {/* Admin Link (if admin) */}
-      {isAdmin && (
-        <div className="mt-auto pt-2 border-t border-[#1a1c2e]">
-          <NavLink
-            to="/admin"
-            className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2 rounded-xl font-medium text-xs transition-all ${
-                isActive
-                  ? 'bg-emerald-500/20 text-emerald-300 font-semibold border border-emerald-500/30'
-                  : 'text-emerald-400/80 hover:text-emerald-300 hover:bg-emerald-500/10'
-              }`
-            }
-          >
+      {/* Admin & Analytics Link */}
+      <div className="mt-auto pt-2 border-t border-[#1a1c2e]">
+        <NavLink
+          to="/admin"
+          className={({ isActive }) =>
+            `flex items-center justify-between px-3 py-2 rounded-xl font-medium text-xs transition-all ${
+              isActive
+                ? 'bg-emerald-500/20 text-emerald-300 font-semibold border border-emerald-500/30 shadow-sm'
+                : 'text-emerald-400/90 hover:text-emerald-300 hover:bg-emerald-500/10'
+            }`
+          }
+        >
+          <div className="flex items-center gap-2.5">
             <ShieldAlert size={16} />
-            <span>Admin Panel</span>
-          </NavLink>
-        </div>
-      )}
+            <span>Admin & Analytics</span>
+          </div>
+          <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-bold">
+            ML
+          </span>
+        </NavLink>
+      </div>
 
       {/* Footer / Settings */}
       <div className="pt-2">
