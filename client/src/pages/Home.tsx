@@ -122,7 +122,7 @@ export const Home: React.FC<HomeProps> = ({ onAddToPlaylist }) => {
             <div
               key={playlist.id}
               onClick={() => navigate(`/playlist/${playlist.id}`)}
-              className="group flex items-center gap-3 p-2 rounded-xl bg-[#141628]/80 hover:bg-[#1d203a] border border-[#222543] transition-all cursor-pointer shadow-md hover:shadow-xl"
+              className="group flex items-center gap-3 p-2.5 rounded-2xl bg-gradient-to-r from-[#1d2345] to-[#171b36] hover:from-[#262e59] hover:to-[#1d2345] border border-[#2e376a] hover:border-cyan-400/50 transition-all cursor-pointer shadow-md hover:shadow-xl"
             >
               <img
                 src={playlist.coverUrl}

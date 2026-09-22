@@ -55,7 +55,7 @@ export const Header: React.FC<HeaderProps> = ({ toggleFriendActivity, showFriend
   };
 
   return (
-    <header className="h-16 px-4 md:px-8 flex items-center justify-between sticky top-0 z-30 bg-[#0c0d14]/80 backdrop-blur-md border-b border-[#22243a]">
+    <header className="h-16 px-4 md:px-8 flex items-center justify-between sticky top-0 z-30 bg-[#161b3a]/90 backdrop-blur-xl border-b border-[#2c3360] shadow-md">
       {/* Left: Navigation Buttons & Optional Inline Search */}
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-1.5">

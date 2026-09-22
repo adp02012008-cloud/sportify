@@ -36,8 +36,8 @@ export const SongCard: React.FC<SongCardProps> = ({ song, playlistContext, onAdd
   return (
     <div
       onClick={handlePlayClick}
-      className={`group relative p-3.5 rounded-2xl bg-[#141525]/70 hover:bg-[#1e2038] border border-[#222543]/40 hover:border-[#373b6b] transition-all duration-300 cursor-pointer shadow-lg hover:shadow-2xl hover:-translate-y-1 flex flex-col justify-between ${
-        isCurrent ? 'ring-1 ring-cyan-400/50 bg-[#191b33]' : ''
+      className={`group relative p-3.5 rounded-2xl bg-gradient-to-b from-[#1c2244] to-[#161a35] hover:from-[#252d59] hover:to-[#1c2244] border border-[#2f386b] hover:border-[#4d5c9c] transition-all duration-300 cursor-pointer shadow-[0_6px_20px_rgba(0,0,0,0.25)] hover:shadow-2xl hover:-translate-y-1 flex flex-col justify-between ${
+        isCurrent ? 'ring-2 ring-cyan-400/70 bg-[#21274d]' : ''
       }`}
     >
       {/* Artwork container */}

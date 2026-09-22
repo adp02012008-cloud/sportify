@@ -38,7 +38,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }`;
 
   return (
-    <aside className="w-60 min-w-[15rem] h-full hidden md:flex flex-col bg-[#0b0c14] border-r border-[#1e2035] px-3.5 py-4 overflow-hidden z-30 select-none">
+    <aside className="w-60 min-w-[15rem] h-full hidden md:flex flex-col bg-[#141834]/95 backdrop-blur-2xl border-r border-[#2c3360] px-3.5 py-4 overflow-hidden z-30 select-none shadow-2xl">
       {/* SoundWave Logo */}
       <Link to="/" className="flex items-center gap-2.5 px-2 py-2 mb-3 group">
         <img

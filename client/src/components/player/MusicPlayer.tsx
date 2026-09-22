@@ -90,7 +90,7 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({
   const speeds = [0.5, 0.75, 1.0, 1.25, 1.5, 2.0];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 h-20 sm:h-24 bg-[#0a0b12]/95 backdrop-blur-xl border-t border-[#1e2035] px-3 sm:px-6 flex items-center justify-between z-40 shadow-2xl">
+    <div className="fixed bottom-0 left-0 right-0 h-20 sm:h-24 bg-[#161a38]/95 backdrop-blur-2xl border-t border-[#2d3463] px-3 sm:px-6 flex items-center justify-between z-40 shadow-[0_-10px_35px_rgba(0,0,0,0.35)]">
       {/* 1. Left Track Information */}
       <div className="flex items-center gap-3 w-1/4 min-w-[150px] max-w-[280px]">
         <div

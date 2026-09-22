@@ -159,7 +159,7 @@ const MainLayout: React.FC = () => {
   const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
 
   return (
-    <div className="flex h-screen w-full bg-[#08090f] text-gray-100 overflow-hidden font-sans select-none">
+    <div className="flex h-screen w-full bg-gradient-to-br from-[#12162e] via-[#0f1326] to-[#0c0f1f] text-slate-100 overflow-hidden font-sans select-none">
       {/* 1. Left Sidebar Navigation (Desktop) */}
       {!isAuthPage && (
         <Sidebar
