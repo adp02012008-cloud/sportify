@@ -1,5 +1,5 @@
 // SoundWave Pre-bundled Audio & Content Catalogue for Zero-Latency Standalone / Vercel Operation
-import { Song, Artist, Album, Playlist, Podcast, Audiobook } from '../types';
+import { Song, Artist, Album, Playlist, Podcast, Audiobook, User } from '../types';
 
 export const defaultSongs: Song[] = [
   {
@@ -2593,3 +2593,172 @@ export const defaultAudiobooks: Audiobook[] = [
     ]
   }
 ];
+
+export const defaultUsers: User[] = [
+  {
+    id: "usr-admin",
+    name: "Alex Vance",
+    username: "alexvance",
+    email: "alex@soundwave.io",
+    role: "ADMIN",
+    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80",
+    isPremium: true,
+    plan: "Master Admin",
+    subscriptionStatus: "ACTIVE"
+  },
+  {
+    id: "usr-admin2",
+    name: "SoundWave System Admin",
+    username: "sysadmin",
+    email: "admin@soundwave.io",
+    role: "ADMIN",
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&auto=format&fit=crop&q=80",
+    isPremium: true,
+    plan: "Enterprise Admin",
+    subscriptionStatus: "ACTIVE"
+  },
+  {
+    id: "usr-sarah",
+    name: "Sarah Connor",
+    username: "sarahc",
+    email: "sarah.c@cyberdyne.io",
+    role: "PREMIUM_USER",
+    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&auto=format&fit=crop&q=80",
+    isPremium: true,
+    plan: "Family Premium",
+    subscriptionStatus: "ACTIVE"
+  },
+  {
+    id: "usr-priya",
+    name: "Priya Sharma",
+    username: "priyasharma",
+    email: "priya.sharma@mumbai.in",
+    role: "PREMIUM_USER",
+    avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=300&auto=format&fit=crop&q=80",
+    isPremium: true,
+    plan: "Individual Premium",
+    subscriptionStatus: "ACTIVE"
+  },
+  {
+    id: "usr-david",
+    name: "David Chen",
+    username: "dchen",
+    email: "dchen@stanford.edu",
+    role: "PREMIUM_USER",
+    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&auto=format&fit=crop&q=80",
+    isPremium: true,
+    plan: "Student Premium",
+    subscriptionStatus: "ACTIVE"
+  },
+  {
+    id: "usr-marcus",
+    name: "Marcus Aurelius",
+    username: "stoicmarcus",
+    email: "marcus@rome.org",
+    role: "USER",
+    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&auto=format&fit=crop&q=80",
+    isPremium: false,
+    plan: "Free Ad-Supported",
+    subscriptionStatus: "FREE"
+  },
+  {
+    id: "usr-elena",
+    name: "Elena Rostova",
+    username: "elena_r",
+    email: "elena.rostova@berlin.de",
+    role: "USER",
+    avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=300&auto=format&fit=crop&q=80",
+    isPremium: false,
+    plan: "Free Ad-Supported",
+    subscriptionStatus: "FREE"
+  },
+  {
+    id: "usr-kenji",
+    name: "Kenji Sato",
+    username: "kenji_synth",
+    email: "kenji.sato@tokyo.jp",
+    role: "USER",
+    avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=300&auto=format&fit=crop&q=80",
+    isPremium: false,
+    plan: "Free Ad-Supported",
+    subscriptionStatus: "FREE"
+  },
+  {
+    id: "usr-maya",
+    name: "Maya Patel",
+    username: "mayapatel",
+    email: "maya.patel@london.co.uk",
+    role: "PREMIUM_USER",
+    avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=300&auto=format&fit=crop&q=80",
+    isPremium: true,
+    plan: "Individual Premium",
+    subscriptionStatus: "ACTIVE"
+  },
+  {
+    id: "usr-liam",
+    name: "Liam O'Connor",
+    username: "liamoc",
+    email: "liam.oc@dublin.ie",
+    role: "USER",
+    avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=300&auto=format&fit=crop&q=80",
+    isPremium: false,
+    plan: "Free Ad-Supported",
+    subscriptionStatus: "FREE"
+  },
+  {
+    id: "usr-sophia",
+    name: "Sophia Martinez",
+    username: "sophiam",
+    email: "sophia.m@barcelona.es",
+    role: "PREMIUM_USER",
+    avatar: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=300&auto=format&fit=crop&q=80",
+    isPremium: true,
+    plan: "Family Premium",
+    subscriptionStatus: "ACTIVE"
+  },
+  {
+    id: "usr-jordan",
+    name: "Jordan Lee",
+    username: "jordanlee",
+    email: "jlee99@seoul.kr",
+    role: "USER",
+    avatar: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=300&auto=format&fit=crop&q=80",
+    isPremium: false,
+    plan: "Free Ad-Supported",
+    subscriptionStatus: "FREE"
+  },
+  {
+    id: "usr-chloe",
+    name: "Chloe Dupont",
+    username: "chloedupont",
+    email: "cdupont@paris.fr",
+    role: "PREMIUM_USER",
+    avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=300&auto=format&fit=crop&q=80",
+    isPremium: true,
+    plan: "Student Premium",
+    subscriptionStatus: "ACTIVE"
+  },
+  {
+    id: "usr-mateo",
+    name: "Mateo Fernandez",
+    username: "mateof",
+    email: "mateo.f@buenosaires.ar",
+    role: "USER",
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&auto=format&fit=crop&q=80",
+    isPremium: false,
+    plan: "Free Ad-Supported",
+    subscriptionStatus: "FREE"
+  },
+  {
+    id: "usr-aisha",
+    name: "Aisha Al-Mansoor",
+    username: "aisha_am",
+    email: "aisha@dubai.ae",
+    role: "PREMIUM_USER",
+    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80",
+    isPremium: true,
+    plan: "Individual Premium",
+    subscriptionStatus: "ACTIVE"
+  }
+];
+

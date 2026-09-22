@@ -17,7 +17,8 @@ import {
   defaultAlbums,
   defaultPlaylists,
   defaultPodcasts,
-  defaultAudiobooks
+  defaultAudiobooks,
+  defaultUsers
 } from '../data/defaultCatalogue';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
@@ -348,12 +349,31 @@ export const api = {
   },
   admin: {
     getStats: async () => {
-      const res = await apiClient.get('/admin/stats');
-      return res;
+      try {
+        const res = await apiClient.get('/admin/stats');
+        if (res.data) return res;
+      } catch (err) {}
+      return {
+        data: {
+          songsCount: defaultSongs.length,
+          usersCount: defaultUsers.length,
+          artistsCount: defaultArtists.length,
+          albumsCount: defaultAlbums.length,
+          revenue: 24890,
+        },
+      };
     },
     getUsers: async () => {
-      const res = await apiClient.get('/admin/users');
-      return { data: res.data.users || res.data || [] };
+      try {
+        const res = await apiClient.get('/admin/users');
+        const list = res.data?.users || res.data;
+        if (Array.isArray(list) && list.length > 0) {
+          return { data: list };
+        }
+      } catch (err) {
+        console.warn('Backend /admin/users not reachable, using default catalogue users', err);
+      }
+      return { data: defaultUsers };
     },
     createSong: async (songData: Partial<Song>) => {
       const res = await apiClient.post('/admin/songs', songData);
