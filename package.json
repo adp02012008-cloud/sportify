@@ -4,7 +4,7 @@
   "private": true,
   "description": "SoundWave — Production-Quality Music, Podcast, and Audiobook Streaming Platform",
   "scripts": {
-    "start": "node server/dist/server.js",
+    "start": "node dist/server.js",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "server": "cd server && npm run dev",
     "client": "cd client && npm run dev",
