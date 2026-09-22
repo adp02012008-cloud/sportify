@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <linearGradient id="swGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06b6d4"/>
+      <stop offset="50%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  <circle cx="50" cy="50" r="46" fill="#0f0f17" stroke="url(#swGrad)" stroke-width="2.5" />
+  <!-- Dynamic Equalizer Sound Waves -->
+  <rect x="22" y="38" width="7" height="24" rx="3.5" fill="url(#swGrad)" />
+  <rect x="33" y="26" width="7" height="48" rx="3.5" fill="url(#swGrad)" />
+  <rect x="44" y="16" width="7" height="68" rx="3.5" fill="url(#swGrad)" filter="url(#glow)" />
+  <rect x="55" y="28" width="7" height="44" rx="3.5" fill="url(#swGrad)" />
+  <rect x="66" y="34" width="7" height="32" rx="3.5" fill="url(#swGrad)" />
+  <rect x="77" y="44" width="7" height="12" rx="3.5" fill="url(#swGrad)" />
+</svg>

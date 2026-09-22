@@ -1,0 +1,197 @@
+// SoundWave Albums Catalog
+// 16+ full albums with tracks, release years, cover artwork
+
+export const mockAlbums = [
+  {
+    id: 'alb-1',
+    title: 'Synthetic Dreams',
+    artist: 'CyberPulse',
+    artistId: 'art-1',
+    releaseYear: 2024,
+    genre: 'Electronic',
+    artwork: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=600&auto=format&fit=crop&q=80',
+    songIds: ['song-1', 'song-2', 'song-29'],
+    durationStr: '10 min 41 sec',
+    likesCount: '48,290'
+  },
+  {
+    id: 'alb-2',
+    title: 'Vapor Waveform',
+    artist: 'Kroma Synth',
+    artistId: 'art-2',
+    releaseYear: 2023,
+    genre: 'Electronic',
+    artwork: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&auto=format&fit=crop&q=80',
+    songIds: ['song-3', 'song-33'],
+    durationStr: '7 min 26 sec',
+    likesCount: '29,400'
+  },
+  {
+    id: 'alb-3',
+    title: 'Golden Hour Glow',
+    artist: 'Aria Vance',
+    artistId: 'art-3',
+    releaseYear: 2024,
+    genre: 'Pop',
+    artwork: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600&auto=format&fit=crop&q=80',
+    songIds: ['song-4', 'song-5', 'song-30'],
+    durationStr: '9 min 48 sec',
+    likesCount: '192,800'
+  },
+  {
+    id: 'alb-4',
+    title: 'Prism of Sound',
+    artist: 'Luna Sterling',
+    artistId: 'art-4',
+    releaseYear: 2023,
+    genre: 'Pop',
+    artwork: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600&auto=format&fit=crop&q=80',
+    songIds: ['song-6'],
+    durationStr: '3 min 12 sec',
+    likesCount: '34,100'
+  },
+  {
+    id: 'alb-5',
+    title: 'Crown & Concrete',
+    artist: 'King Cipher',
+    artistId: 'art-5',
+    releaseYear: 2023,
+    genre: 'Hip-Hop',
+    artwork: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=600&auto=format&fit=crop&q=80',
+    songIds: ['song-7', 'song-8'],
+    durationStr: '6 min 38 sec',
+    likesCount: '88,900'
+  },
+  {
+    id: 'alb-6',
+    title: 'Underground Frequency',
+    artist: 'Echo Flow',
+    artistId: 'art-6',
+    releaseYear: 2024,
+    genre: 'Hip-Hop',
+    artwork: 'https://images.unsplash.com/photo-1460723237483-7a6dc9d0b212?w=600&auto=format&fit=crop&q=80',
+    songIds: ['song-9'],
+    durationStr: '3 min 44 sec',
+    likesCount: '21,500'
+  },
+  {
+    id: 'alb-7',
+    title: 'Surili Shaam',
+    artist: 'Arijit Verma',
+    artistId: 'art-7',
+    releaseYear: 2024,
+    genre: 'Bollywood',
+    artwork: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=600&auto=format&fit=crop&q=80',
+    songIds: ['song-10', 'song-11', 'song-32'],
+    durationStr: '13 min 21 sec',
+    likesCount: '342,000'
+  },
+  {
+    id: 'alb-8',
+    title: 'Rangrez',
+    artist: 'Shreya Kapoor',
+    artistId: 'art-8',
+    releaseYear: 2023,
+    genre: 'Bollywood',
+    artwork: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=600&auto=format&fit=crop&q=80',
+    songIds: ['song-12'],
+    durationStr: '3 min 35 sec',
+    likesCount: '76,400'
+  },
+  {
+    id: 'alb-9',
+    title: 'Chennai Beats',
+    artist: 'Anirudh Sriram',
+    artistId: 'art-9',
+    releaseYear: 2024,
+    genre: 'Tamil',
+    artwork: 'https://images.unsplash.com/photo-1520523839898-507127027582?w=600&auto=format&fit=crop&q=80',
+    songIds: ['song-13', 'song-14', 'song-34'],
+    durationStr: '11 min 37 sec',
+    likesCount: '218,000'
+  },
+  {
+    id: 'alb-10',
+    title: 'Thendral Raagam',
+    artist: 'Harini Sundar',
+    artistId: 'art-10',
+    releaseYear: 2023,
+    genre: 'Tamil',
+    artwork: 'https://images.unsplash.com/photo-1506157786151-b8491531f063?w=600&auto=format&fit=crop&q=80',
+    songIds: ['song-15'],
+    durationStr: '4 min 00 sec',
+    likesCount: '41,200'
+  },
+  {
+    id: 'alb-11',
+    title: 'Warm Mug Sessions',
+    artist: 'Coffee Bean Chords',
+    artistId: 'art-11',
+    releaseYear: 2024,
+    genre: 'Lo-fi',
+    artwork: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=600&auto=format&fit=crop&q=80',
+    songIds: ['song-16', 'song-17'],
+    durationStr: '5 min 22 sec',
+    likesCount: '512,000'
+  },
+  {
+    id: 'alb-12',
+    title: 'Pastel Skies',
+    artist: 'Lofi Sloth',
+    artistId: 'art-12',
+    releaseYear: 2023,
+    genre: 'Lo-fi',
+    artwork: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&auto=format&fit=crop&q=80',
+    songIds: ['song-18', 'song-31'],
+    durationStr: '5 min 14 sec',
+    likesCount: '198,000'
+  },
+  {
+    id: 'alb-13',
+    title: 'Fossil & Flame',
+    artist: 'The Iron Reverbs',
+    artistId: 'art-13',
+    releaseYear: 2023,
+    genre: 'Rock',
+    artwork: 'https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?w=600&auto=format&fit=crop&q=80',
+    songIds: ['song-19', 'song-20'],
+    durationStr: '8 min 12 sec',
+    likesCount: '62,700'
+  },
+  {
+    id: 'alb-14',
+    title: 'Overdrive Protocol',
+    artist: 'Silver Distortion',
+    artistId: 'art-14',
+    releaseYear: 2024,
+    genre: 'Rock',
+    artwork: 'https://images.unsplash.com/photo-1511735111819-9a3f7709049c?w=600&auto=format&fit=crop&q=80',
+    songIds: ['song-21'],
+    durationStr: '3 min 38 sec',
+    likesCount: '18,400'
+  },
+  {
+    id: 'alb-15',
+    title: 'Smoke & Bourbon',
+    artist: 'Miles Henderson Quartet',
+    artistId: 'art-15',
+    releaseYear: 2023,
+    genre: 'Jazz',
+    artwork: 'https://images.unsplash.com/photo-1511192336575-5a79af67a629?w=600&auto=format&fit=crop&q=80',
+    songIds: ['song-22', 'song-23'],
+    durationStr: '9 min 55 sec',
+    likesCount: '45,300'
+  },
+  {
+    id: 'alb-16',
+    title: 'Coffee & Clarinet',
+    artist: 'Ella Laurent',
+    artistId: 'art-16',
+    releaseYear: 2024,
+    genre: 'Jazz',
+    artwork: 'https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f?w=600&auto=format&fit=crop&q=80',
+    songIds: ['song-24'],
+    durationStr: '4 min 04 sec',
+    likesCount: '39,100'
+  }
+];
